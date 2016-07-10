@@ -1,0 +1,10 @@
+---
+defaults:
+    default: defaultValue
+    key: defaultValue
+
+development:
+    key: devValue
+
+production:
+    key: prodValue

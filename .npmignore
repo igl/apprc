@@ -1,0 +1,13 @@
+.npmrc
+.npmignore
+.eslintrc
+.travis.yml
+.flowconfig
+src/
+coverage/
+tests/
+Makefile
+
+.apprcrc
+.myapprc
+test.js
