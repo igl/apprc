@@ -47,12 +47,13 @@ function parseFile (filePath) {
 /**
  * Main
  */
-module.exports = function apprc (_envKey, _appName) {
-    var cwd = process.cwd()
-    var pkg = parseFile(findClosest(cwd, 'package.json'))
+module.exports = function apprc (_extraVars, _envKey, _appName) {
+    var cwd = process.cwd();
+    var pkg = parseFile(findClosest(cwd, 'package.json'));
 
-    var appName = _appName || pkg.name
-    var envKey = _envKey || process.env.NODE_ENV || 'development'
+    var defaults = _extraVars || {}
+    var envKey = _envKey || process.env.NODE_ENV || 'development';
+    var appName = _appName || pkg.name;
 
     var locations = [
         findClosest(cwd, '.' + appName + 'rc'),
@@ -66,19 +67,26 @@ module.exports = function apprc (_envKey, _appName) {
 
     var locationsFound = locations.filter(function (filePath) {
         try {
-            if (fs.statSync(filePath).isFile()) { return true }
+            if (fs.statSync(filePath).isFile()) { return true; }
         } catch (_) { /* ignore error */ }
-        return false
+        return false;
     })
 
-    var allConfigs = locationsFound.map(parseFile)
+    var allConfigs = locationsFound.map(parseFile);
 
-    var mergedConfigs = deepExtend.apply(null, allConfigs)
+    var merged = deepExtend.apply(null, allConfigs);
 
     var finalConfig = deepExtend(
-        mergedConfigs.defaults || {},
-        mergedConfigs[envKey] || {}
-    )
+        defaults,
+        (envKey
+            ? deepExtend(merged.defaults || {}, merged[envKey] || {})
+            : merged
+        ),
+        {
+            appName: appName,
+            configs: locationsFound
+        }
+    );
 
-    return deepFreeze(finalConfig)
+    return deepFreeze(finalConfig);
 }

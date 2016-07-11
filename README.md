@@ -18,12 +18,13 @@ npm install --save apprc
 ## Usage
 
 ```javascript
-const config = require('apprc')(envKey, appName)
+const config = require('apprc')(defaults, envKey, appName)
 ```
 
 arguments default to:
 
 ```javascript
+defaults = {}
 appName = package_json.name
 envKey = process.env.NODE_ENV || 'development'
 ```

@@ -1,6 +1,6 @@
 ---
 defaults:
-    name: myapp
+    other: true
     default: defaultValue
     key: defaultValue
 
