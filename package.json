@@ -5,6 +5,13 @@
   "author": "Richard Keil",
   "license": "MIT",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/igl/apprc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/igl/apprc/issues"
+  },
   "scripts": {
     "test": "ava test.js"
   },
