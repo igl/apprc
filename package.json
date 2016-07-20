@@ -1,6 +1,6 @@
 {
   "name": "apprc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "opinionated and non-configurable config loader for lazy people who like yaml",
   "author": "Richard Keil",
   "license": "MIT",
