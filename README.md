@@ -1,6 +1,6 @@
 # apprc
 
-[![build status](https://img.shields.io/travis/igl/prelude.svg?style=flat-square)](https://travis-ci.org/igl/apprc)
+[![build status](https://travis-ci.org/igl/apprc.svg?branch=master)](https://travis-ci.org/igl/apprc)
 [![npm version](https://img.shields.io/npm/v/apprc.svg?style=flat-square)](https://www.npmjs.com/package/apprc)
 [![npm downloads](https://img.shields.io/npm/dm/apprc.svg?style=flat-square)](https://www.npmjs.com/package/apprc)
 
