@@ -13,16 +13,16 @@
     "url": "https://github.com/igl/apprc/issues"
   },
   "scripts": {
-    "test": "ava test.js"
+    "test": "eslint bin.js index.js && ava test.js"
   },
   "devDependencies": {
-    "ava": "0.15.2",
-    "eslint": "3.0.1"
+    "ava": "0.16.0",
+    "eslint": "3.8.1"
   },
   "dependencies": {
     "deep-extend": "0.4.1",
     "deep-freeze": "0.0.1",
     "js-yaml": "3.6.1",
-    "os-homedir": "1.0.1"
+    "os-homedir": "1.0.2"
   }
 }
