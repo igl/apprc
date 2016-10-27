@@ -1,10 +1,13 @@
 {
   "name": "apprc",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "opinionated and non-configurable config loader for lazy people who like yaml",
   "author": "Richard Keil",
   "license": "MIT",
   "main": "index.js",
+  "bin": {
+    "apprc": "./bin.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/igl/apprc.git"
@@ -23,6 +26,7 @@
     "deep-extend": "0.4.1",
     "deep-freeze": "0.0.1",
     "js-yaml": "3.6.1",
-    "os-homedir": "1.0.2"
+    "os-homedir": "1.0.2",
+    "yargs": "6.3.0"
   }
 }
