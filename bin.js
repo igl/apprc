@@ -1,12 +1,4 @@
 #!/usr/bin/env node
-var util = require('util')
-
-function write () {
-    process.stdout.write(
-        util.format.apply(util, arguments)
-    )
-}
-
 var argv = require('yargs')
     .usage('$0 <variable> [args]')
     .option('env', {
@@ -22,20 +14,35 @@ var argv = require('yargs')
         type: 'string'
     })
     .help()
-    .argv
+    .argv;
 
-var conf = require('./index')(null, argv.env, argv.name)
-var varPath = argv._[0]
+var conf = require('./index')(null, argv.env, argv.name);
+var varPath = argv._[0];
+
+function write (obj) {
+    if (typeof obj === 'object') {
+        process.stdout.write(JSON.stringify(obj));
+    }
+    else {
+        process.stdout.write(obj);
+    }
+}
 
 if (!varPath) {
-    write(JSON.stringify(conf))
-} else {
-    var current
-    varPath = varPath.split('.')
+    write(conf);
+}
+else {
+    varPath = varPath.split('.');
 
+    var current = conf;
     for (var i = 0, len = varPath.length; i < len; i += 1) {
-        current = conf[varPath[i]]
+        current = current[varPath[i]];
+
+        if (typeof current === 'undefined') {
+            current = '';
+            break;
+        }
     }
 
-    write(current)
+    write(current);
 }

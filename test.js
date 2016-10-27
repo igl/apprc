@@ -4,6 +4,7 @@
 import test from 'ava'
 import apprc from './index'
 import deepFreeze from 'deep-freeze'
+import { execSync } from 'child_process'
 
 const expected = deepFreeze({
     defaults: {
@@ -89,4 +90,31 @@ test('returns frozen config', (t) => {
         cfg.key = 'foo'
     })
     t.is(cfg.key, expected.development.key)
+})
+
+/**
+ * CLI Tests
+ */
+test('cli loads development config', (t) => {
+    const cfg = JSON.parse(
+        execSync('node bin.js --env development').toString()
+    )
+    t.is(cfg.default, expected.development.default)
+    t.is(cfg.key, expected.development.key)
+})
+
+test('cli loads production config', (t) => {
+    const cfg = JSON.parse(
+        execSync('node bin.js --env production').toString()
+    )
+    t.is(cfg.default, expected.production.default)
+    t.is(cfg.key, expected.production.key)
+})
+
+test('cli returns a single value', (t) => {
+    const key = execSync('node bin.js key --env production').toString()
+    t.is(key, expected.production.key)
+
+    const nestedVal = execSync('node bin.js key --env production').toString()
+    t.is(nestedVal, expected.production.nested.value)
 })
