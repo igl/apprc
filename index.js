@@ -1,18 +1,19 @@
-'use strict'
+'use strict';
 
 var fs = require('fs');
 var path = require('path');
 var YML = require('js-yaml');
 var osHomedir = require('os-homedir');
-var deepExtend = require('deep-extend')
-var deepFreeze = require('deep-freeze')
+var deepExtend = require('deep-extend');
+var deepFreeze = require('deep-freeze');
+var NODE_ENV = process.env.NODE_ENV;
 
 /**
  * Utils
  */
-function findClosest (cwd, fileName) {
+function findClosestSync (cwd, fileName) {
     var configFile;
-    var currentDir = path.resolve(cwd, '.');
+    var currentDir = path.resolve(cwd);
 
     while (true) {
         try {
@@ -21,7 +22,9 @@ function findClosest (cwd, fileName) {
             if (fs.statSync(configFile).isFile()) {
                 break;
             }
-        } catch (_) { /* ignore error */ }
+        } catch (_) {
+            configFile = undefined;
+        }
 
         configFile = undefined;
         currentDir = path.resolve(currentDir, '..');
@@ -34,45 +37,55 @@ function findClosest (cwd, fileName) {
     return configFile;
 }
 
-function parseFile (filePath) {
+function parseFileSync (filePath) {
     try {
         var data = fs.readFileSync(filePath, 'utf8');
         return YML.safeLoad(data);
     }
     catch (err) {
-        console.error('apprc could not parse file "' + filePath + '":' + err.message);
+        throw new Error(
+            'apprc could not parse file "' + filePath + '":' + err.message
+        );
     }
 }
 
 /**
  * Main
  */
-module.exports = function apprc (_extraVars, _envKey, _appName) {
+module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
     var cwd = process.cwd();
-    var pkg = parseFile(findClosest(cwd, 'package.json'));
+    var pkg = parseFileSync(findClosestSync(cwd, 'package.json'));
 
-    var defaults = _extraVars || {}
-    var envKey = _envKey || process.env.NODE_ENV || 'development';
+    var defaults = _extraVars || {};
+    var envKey = _envKey ? _envKey : NODE_ENV || 'development';
     var appName = _appName || pkg.name;
 
-    var locations = [
-        findClosest(cwd, '.' + appName + 'rc'),
+    if (!appName) {
+        throw new Error(
+            'apprc could not detect "appName". ' +
+            'Please make sure there is a package.json with a name property ' +
+            'or provide it manually.'
+        );
+    }
+
+    var locations = _locations || [
+        findClosestSync(cwd, '.' + appName + 'rc'),
         path.join(osHomedir(), '.' + appName + 'rc'),
         path.join(osHomedir(), appName, '/config'),
         path.join(osHomedir(), '/.config/', appName),
         path.join(osHomedir(), '/.config/', appName, '/config'),
         path.join('/etc', appName + 'rc'),
         path.join('/etc', appName, '/config')
-    ]
+    ];
 
     var locationsFound = locations.filter(function (filePath) {
         try {
             if (fs.statSync(filePath).isFile()) { return true; }
         } catch (_) { /* ignore error */ }
         return false;
-    })
+    });
 
-    var allConfigs = locationsFound.map(parseFile);
+    var allConfigs = locationsFound.map(parseFileSync);
 
     var merged = deepExtend.apply(null, allConfigs);
 
