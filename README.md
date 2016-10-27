@@ -1,8 +1,8 @@
 # apprc
 
 [![build status](https://travis-ci.org/igl/apprc.svg?branch=master)](https://travis-ci.org/igl/apprc)
-[![npm version](https://img.shields.io/npm/v/apprc.svg?style=flat-square)](https://www.npmjs.com/package/apprc)
-[![npm downloads](https://img.shields.io/npm/dm/apprc.svg?style=flat-square)](https://www.npmjs.com/package/apprc)
+[![npm version](https://img.shields.io/npm/v/apprc.svg?style=flat)](https://www.npmjs.com/package/apprc)
+[![npm downloads](https://img.shields.io/npm/dm/apprc.svg?style=flat)](https://www.npmjs.com/package/apprc)
 
 My opinionated and non-configurable configuration loader for lazy people who like yaml.
 
@@ -20,6 +20,18 @@ npm install --save apprc
 
 ## Usage
 
+apprc will look for config files in the following locations:
+
+- closest `.${appName}rc` by continuously looking in '../' until '/' is reached
+- `$HOME/.${appName}rc`
+- `$HOME/${appName}/config`
+- `$HOME/.config/${appName}rc`
+- `$HOME/.config/${appName}/config`
+- `/etc/${appName}rc`
+- `/etc/${appName}/config`
+
+### Module
+
 ```javascript
 const config = require('apprc')(defaults, envKey, appName)
 ```
@@ -32,16 +44,29 @@ appName = package_json.name
 envKey = process.env.NODE_ENV || 'development'
 ```
 
+### CLI
 
-apprc will look for config files in the following locations:
+```
+$ apprc --help
 
-- closest `.${appName}rc` by continuously looking in '../' until the hd root '/' is reached
-- `$HOME/.${appName}rc`
-- `$HOME/${appName}/config`
-- `$HOME/.config/${appName}rc`
-- `$HOME/.config/${appName}/config`
-- `/etc/${appName}rc`
-- `/etc/${appName}/config`
+apprc <variable> [args]
+
+Options:
+  --env, -e   environment                                    [string] [required]
+  --name, -n  app name                                                  [string]
+  --help      Show help                                                [boolean]
+
+
+$ apprc --env production
+{"http":{"port":80}}
+
+$ apprc http --env production
+{"port":80}
+
+$ apprc http.port --env production
+80
+
+```
 
 
 ## Config Format
