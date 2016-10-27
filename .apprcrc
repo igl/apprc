@@ -2,9 +2,16 @@
 defaults:
     default: defaultValue
     key: defaultValue
+    nested:
+        default: defaultValue
+        value: defaultValue
 
 development:
     key: devValue
+    nested:
+        value: devValue
 
 production:
     key: prodValue
+    nested:
+        value: prodValue

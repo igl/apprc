@@ -1,22 +1,36 @@
+/* eslint-env node, es6 */
 'use strict'
 
 import test from 'ava'
 import apprc from './index'
+import deepFreeze from 'deep-freeze'
 
-const expected = {
+const expected = deepFreeze({
     defaults: {
         default: 'defaultValue',
-        key: 'defaultValue'
+        key: 'defaultValue',
+        nested: {
+            default: 'defaultValue',
+            value: 'defaultValue'
+        }
     },
     development: {
         default: 'defaultValue',
-        key: 'devValue'
+        key: 'devValue',
+        nested: {
+            default: 'defaultValue',
+            value: 'devValue'
+        }
     },
     production: {
         default: 'defaultValue',
-        key: 'prodValue'
+        key: 'prodValue',
+        nested: {
+            default: 'defaultValue',
+            value: 'prodValue'
+        }
     }
-}
+})
 
 test('loads development config by default', (t) => {
     const cfg = apprc()
@@ -43,6 +57,13 @@ test('has .configs[]', (t) => {
     t.true(cfg.configs.length > 0)
 })
 
+test('correctly deep extends configs', (t) => {
+    const cfgDev = apprc(null, 'development')
+    t.deepEqual(cfgDev.nested, expected.development.nested)
+    const cfgProd = apprc(null, 'production')
+    t.deepEqual(cfgProd.nested, expected.production.nested)
+})
+
 test('loads development config', (t) => {
     const cfg = apprc(null, 'development')
     t.is(cfg.default, expected.development.default)
@@ -62,7 +83,7 @@ test('loads custom appName', (t) => {
     t.is(cfg.other, true)
 })
 
-test('freezes config', (t) => {
+test('returns frozen config', (t) => {
     const cfg = apprc()
     t.throws(() => {
         cfg.key = 'foo'
