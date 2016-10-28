@@ -3,12 +3,14 @@
 [![build status](https://travis-ci.org/igl/apprc.svg?branch=master)](https://travis-ci.org/igl/apprc)
 [![npm version](https://img.shields.io/npm/v/apprc.svg?style=flat)](https://www.npmjs.com/package/apprc)
 [![npm downloads](https://img.shields.io/npm/dm/apprc.svg?style=flat)](https://www.npmjs.com/package/apprc)
+[![npm dependencies](https://david-dm.org/igl/apprc.svg?style=flat)](https://david-dm.org/igl/apprc)
 
-My opinionated and non-configurable configuration loader for lazy people who like yaml.
+
+My opinionated and almost-non-configurable configuration loader for lazy people who like yaml.
 
 - 1 file for multible environments
 - supports yaml or json
-- deep-freezes config object
+- deep-freezes   config object
 
 
 ## Installation
