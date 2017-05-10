@@ -54,9 +54,12 @@ $ apprc --help
 apprc <variable> [args]
 
 Options:
-  --env, -e   environment                                    [string] [required]
-  --name, -n  app name                                                  [string]
-  --help      Show help                                                [boolean]
+  --env, -e        Environment                               [string] [required]
+  --name, -n       Name (default: "name" in package.json)               [string]
+  --force, -f      Don't bail on missing value                         [boolean]
+  --undefined, -u  Fallback output of missing value                     [string]
+  --delimiter, -d  Custom path delimiter (default: ".")  [string] [default: "."]
+  --help, -h, -?   Show help                                           [boolean]
 
 
 $ apprc --env production

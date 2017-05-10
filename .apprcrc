@@ -12,6 +12,11 @@ defaults:
     nested:
         default: defaultValue
         value: defaultValue
+        array: [ 'so', 'much', 'values' ]
+        even:
+            deeper: defaultValue
+            yolo:
+                value: defaultValue
 
 development:
     key: devValue

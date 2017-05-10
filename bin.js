@@ -25,13 +25,21 @@ var argv = require('yargs')
         describe: 'Fallback output of missing value',
         type: 'string'
     })
+    .option('delimiter', {
+        alias: 'd',
+        demand: false,
+        default: '.',
+        describe: 'Custom path delimiter (default: ".")',
+        type: 'string'
+    })
     .option('help', {
-        alias: ['h', '?']
+        alias: ['h', '?'],
     })
     .help()
     .argv;
 
 var config = require('./index')(null, argv.env, argv.name);
+var delimiter = argv.delimiter;
 
 function write (value) {
     if (typeof value === 'string') {
@@ -44,14 +52,26 @@ function write (value) {
             if (typeof argv.undefined !== 'undefined') {
                 process.stdout.write(argv.undefined);
             } else {
-                console.error('apprc failed to stringify value:', value); // eslint-disable-line
+                // eslint-disable-next-line
+                console.error(
+                    'apprc could not find "%s". ' +
+                    'Please make sure the value is defined in your configuration files' +
+                    'or use --force to omit this error.',
+                    argv._[0]
+                );
                 process.exit(1);
             }
         }
     }
 }
 
-var keyPath = argv._[0] && argv._[0].split('.');
+var keyPath = argv._[0] && (
+    argv._[0]
+        .replace(/\[/g, delimiter)
+        .replace(/\]/g, '')
+        .replace(/^\./, '')
+        .split(delimiter)
+);
 
 if (!keyPath) {
     write(config);
