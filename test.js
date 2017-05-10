@@ -10,6 +10,10 @@ const expected = deepFreeze({
     defaults: {
         default: 'defaultValue',
         key: 'defaultValue',
+        num: 42,
+        bool: true,
+        arr: [ 1, 2, 'foo' ],
+        json: { key: 'value' },
         nested: {
             default: 'defaultValue',
             value: 'defaultValue'
@@ -32,6 +36,10 @@ const expected = deepFreeze({
         }
     }
 })
+
+function run (args = '') {
+    return execSync(`node bin.js ${ args }`, { stdio: 'pipe' }).toString()
+}
 
 test('loads development config by default', (t) => {
     const cfg = apprc()
@@ -97,7 +105,7 @@ test('returns frozen config', (t) => {
  */
 test('cli loads development config', (t) => {
     const cfg = JSON.parse(
-        execSync('node bin.js --env development').toString()
+        run('--env development')
     )
     t.is(cfg.default, expected.development.default)
     t.is(cfg.key, expected.development.key)
@@ -105,16 +113,62 @@ test('cli loads development config', (t) => {
 
 test('cli loads production config', (t) => {
     const cfg = JSON.parse(
-        execSync('node bin.js --env production').toString()
+        run('--env production')
     )
     t.is(cfg.default, expected.production.default)
     t.is(cfg.key, expected.production.key)
 })
 
 test('cli returns a single value', (t) => {
-    const key = execSync('node bin.js key --env production').toString()
+    const key = run('key --env production')
     t.is(key, expected.production.key)
 
-    const nestedVal = execSync('node bin.js key --env production').toString()
+    const nestedVal = run('key --env production')
     t.is(nestedVal, expected.production.nested.value)
+})
+
+test('cli returns nested values', (t) => {
+    const key = run('key --env production')
+    t.is(key, expected.production.key)
+
+    const nestedVal = run('key --env production')
+    t.is(nestedVal, expected.production.nested.value)
+})
+
+test('cli returns JSON types properly', (t) => {
+    t.is(run('num --env production'), '42')
+    t.is(run('zero --env production'), '0')
+    t.is(run('truthy --env production'), 'true')
+    t.is(run('falsy --env production'), 'false')
+    t.is(run('array --env production'), `[1,2,"foo"]`)
+    t.is(run('json --env production'), `{"key":"value"}`)
+    t.is(run('null --env production'), `null`)
+})
+
+test('cli exits with error code when key is "undefined"', (t) => {
+    const errorMessage = 'apprc failed to stringify value: undefined'
+    try {
+        run('this.is.definitly.missing --env development')
+    } catch (e) {
+        if (!e.message.includes(errorMessage)) {
+            throw new Error('should exit with error code when key is "undefined"')
+        }
+    }
+})
+
+test('cli: --undefined does not fail when key is "undefined"', (t) => {
+    try {
+        run('this.is.definitly.missing --env development --undefined')
+    } catch (e) {
+        throw new Error('should NOT exit with error code when key is "undefined"')
+    }
+})
+
+test('cli: --undefined returns the fallback value', (t) => {
+    try {
+        const key = run('this.is.definitly.missing --env development --undefined foobar')
+        t.is(key, 'foobar')
+    } catch (e) {
+        throw new Error('should NOT exit with error code when key is "undefined"')
+    }
 })

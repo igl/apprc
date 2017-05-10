@@ -2,6 +2,13 @@
 defaults:
     default: defaultValue
     key: defaultValue
+    num: 42
+    zero: 0
+    truthy: true
+    falsy: false
+    array: [ 1, 2, 'foo' ]
+    json: { key: 'value' }
+    null: null
     nested:
         default: defaultValue
         value: defaultValue

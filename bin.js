@@ -4,45 +4,67 @@ var argv = require('yargs')
     .option('env', {
         alias: 'e',
         demand: true,
-        describe: 'environment',
+        describe: 'Environment',
         type: 'string'
     })
     .option('name', {
         alias: 'n',
         demand: false,
-        describe: 'app name (default: .name property of closest package.json)',
+        describe: 'Name (default: "name" in package.json)',
         type: 'string'
+    })
+    .option('force', {
+        alias: 'f',
+        demand: false,
+        describe: 'Don\'t bail on missing value',
+        type: 'boolean'
+    })
+    .option('undefined', {
+        alias: 'u',
+        demand: false,
+        describe: 'Fallback output of missing value',
+        type: 'string'
+    })
+    .option('help', {
+        alias: ['h', '?']
     })
     .help()
     .argv;
 
-var conf = require('./index')(null, argv.env, argv.name);
-var varPath = argv._[0];
+var config = require('./index')(null, argv.env, argv.name);
 
-function write (obj) {
-    if (typeof obj === 'object') {
-        process.stdout.write(JSON.stringify(obj));
+function write (value) {
+    if (typeof value === 'string') {
+        process.stdout.write(value);
     }
     else {
-        process.stdout.write(obj);
+        try {
+            process.stdout.write(JSON.stringify(value));
+        } catch (e) {
+            if (typeof argv.undefined !== 'undefined') {
+                process.stdout.write(argv.undefined);
+            } else {
+                console.error('apprc failed to stringify value:', value); // eslint-disable-line
+                process.exit(1);
+            }
+        }
     }
 }
 
-if (!varPath) {
-    write(conf);
+var keyPath = argv._[0] && argv._[0].split('.');
+
+if (!keyPath) {
+    write(config);
 }
 else {
-    varPath = varPath.split('.');
+    var value = config;
+    for (var i = 0, len = keyPath.length; i < len; i += 1) {
+        value = value[keyPath[i]];
 
-    var current = conf;
-    for (var i = 0, len = varPath.length; i < len; i += 1) {
-        current = current[varPath[i]];
-
-        if (typeof current === 'undefined') {
-            current = '';
+        if (typeof value === 'undefined') {
             break;
         }
     }
 
-    write(current);
+    write(value);
 }
