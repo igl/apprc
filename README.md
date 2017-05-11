@@ -16,7 +16,7 @@ My opinionated and almost-non-configurable configuration loader for lazy people 
 ## Installation
 
 ```
-npm install --save apprc
+yarn add apprc
 ```
 
 
