@@ -49,6 +49,14 @@ function parseFileSync (filePath) {
     }
 }
 
+function fileExistsSync (path) {
+    try {
+        fs.statSync(path).isFile()
+        return true
+    } catch (_) { /* ignore error */}
+    return false
+}
+
 /**
  * Main
  */
@@ -70,6 +78,8 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
 
     var locations = _locations || [
         findClosestSync(cwd, '.' + appName + 'rc'),
+        findClosestSync(cwd, '.' + appName + 'rc.yml'),
+        findClosestSync(cwd, '.' + appName + 'rc.json'),
         path.join(osHomedir(), '.' + appName + 'rc'),
         path.join(osHomedir(), appName, '/config'),
         path.join(osHomedir(), '.' + appName, '/config'),
@@ -77,19 +87,17 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         path.join(osHomedir(), '/.config/', appName, '/config'),
         path.join('/etc/', appName + 'rc'),
         path.join('/etc/', appName, '/config'),
-    ];
+    ].filter(Boolean);
 
     var locationsFound = locations.reduce(function (found, nextLoc) {
-        try {
-            if (fs.statSync(nextLoc).isFile())
-                found.push(nextLoc)
-            else if (fs.statSync(nextLoc + '.yml').isFile())
-                found.push(nextLoc + '.yml')
-            else if (fs.statSync(nextLoc + '.json').isFile())
-                found.push(nextLoc + '.json')
-            else if (fs.statSync(nextLoc + '.yaml').isFile())
-                found.push(nextLoc + '.yaml')
-        } catch (_) { /* ignore error */ }
+        if (fileExistsSync(nextLoc))
+            found.push(nextLoc)
+        else if (fileExistsSync(nextLoc + '.yml'))
+            found.push(nextLoc + '.yml')
+        else if (fileExistsSync(nextLoc + '.json'))
+            found.push(nextLoc + '.json')
+        else if (fileExistsSync(nextLoc + '.yaml'))
+            found.push(nextLoc + '.yaml')
 
         return found;
     }, []);

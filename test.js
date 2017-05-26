@@ -37,6 +37,18 @@ test('has and respects appName argument', (t) => {
     t.is(cfg2.appName, 'myapp')
 })
 
+test('try to load config with .yml extension', (t) => {
+    const cfg = apprc(null, null, 'myapp1')
+    t.is(cfg.appName, 'myapp1')
+    t.true(cfg.configs.length === 1)
+})
+
+test('try to load config with .json extension', (t) => {
+    const cfg = apprc(null, null, 'myapp2')
+    t.is(cfg.appName, 'myapp2')
+    t.true(cfg.configs.length === 1)
+})
+
 test('has .configs[]', (t) => {
     const cfg = apprc(null)
     t.true(Array.isArray(cfg.configs))
