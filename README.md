@@ -27,10 +27,13 @@ apprc will look for config files in the following locations:
 - closest `.${appName}rc` by continuously looking in '../' until '/' is reached
 - `$HOME/.${appName}rc`
 - `$HOME/${appName}/config`
+- `$HOME/.${appName}/config`
 - `$HOME/.config/${appName}rc`
 - `$HOME/.config/${appName}/config`
 - `/etc/${appName}rc`
 - `/etc/${appName}/config`
+
+files can optionally have the `.yml` or `.json` extension in their names
 
 ### Module
 
