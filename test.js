@@ -14,8 +14,6 @@ const expected = deepFreeze(
     )
 )
 
-console.log(expected)
-
 function run (args = '') {
     return execSync(`node bin.js ${ args }`, { stdio: 'pipe' }).toString()
 }

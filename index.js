@@ -72,18 +72,27 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         findClosestSync(cwd, '.' + appName + 'rc'),
         path.join(osHomedir(), '.' + appName + 'rc'),
         path.join(osHomedir(), appName, '/config'),
+        path.join(osHomedir(), '.' + appName, '/config'),
         path.join(osHomedir(), '/.config/', appName),
         path.join(osHomedir(), '/.config/', appName, '/config'),
-        path.join('/etc', appName + 'rc'),
-        path.join('/etc', appName, '/config')
+        path.join('/etc/', appName + 'rc'),
+        path.join('/etc/', appName, '/config'),
     ];
 
-    var locationsFound = locations.filter(function (filePath) {
+    var locationsFound = locations.reduce(function (found, nextLoc) {
         try {
-            if (fs.statSync(filePath).isFile()) { return true; }
+            if (fs.statSync(nextLoc).isFile())
+                found.push(nextLoc)
+            else if (fs.statSync(nextLoc + '.yml').isFile())
+                found.push(nextLoc + '.yml')
+            else if (fs.statSync(nextLoc + '.json').isFile())
+                found.push(nextLoc + '.json')
+            else if (fs.statSync(nextLoc + '.yaml').isFile())
+                found.push(nextLoc + '.yaml')
         } catch (_) { /* ignore error */ }
-        return false;
-    });
+
+        return found;
+    }, []);
 
     var allConfigs = locationsFound.map(parseFileSync);
 
