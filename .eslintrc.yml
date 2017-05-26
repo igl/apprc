@@ -2,39 +2,65 @@
 root: true
 extends: "eslint:recommended"
 parserOptions:
-  ecmaVersion: 6
-  sourceType: module
-  ecmaFeatures:
-    jsx: true
+    ecmaVersion: 6
+    sourceType: module
+    ecmaFeatures:
+        jsx: true
 env:
-  node: true
+    node: true
 rules:
-  strict: 0
-  prefer-const: 2
-  wrap-iife: [ 2, "outside" ]
-  radix: 2
-  use-isnan: 2
-  indent: [ 2, 4, { "SwitchCase": 0 } ]
-  default-case: 2
-  func-style: [ 2, "declaration", { "allowArrowFunctions": true } ]
-  comma-spacing: [ 2, { "before": false, "after": true } ]
-  space-before-function-paren: 2
-  space-before-blocks: 2
-  keyword-spacing: 2
-  space-unary-ops: 2
-  space-infix-ops: [ 2, { int32Hint: false } ]
-  arrow-spacing: 2
-  no-constant-condition: 0
-  no-throw-literal: 2
-  no-proto: 2
-  no-unused-vars: [ 2, { argsIgnorePattern: "^_$" } ]
-  no-extend-native: 2
-  no-with: 2
-  no-obj-calls: 2
-  no-eval: 2
-  no-implied-eval: 2
-  no-spaced-func: 2
-  no-trailing-spaces: 2
-  no-irregular-whitespace: 2
-  no-use-before-define: [ 2, { "functions": false } ]
-  no-multiple-empty-lines: [ 2, { "max": 2, "maxEOF": 1 } ]
+    # 2 = errors (bugs)
+    default-case: 2
+    eqeqeq: [ 2, "smart" ]
+    no-eval: 2
+    no-implied-eval: 2
+    no-extend-native: 2
+    no-irregular-whitespace: 2
+    no-obj-calls: 2
+    no-octal: 2
+    no-proto: 2
+    no-redeclare: 2
+    no-return-await: 2
+    no-throw-literal: 2
+    no-undef: 0 # handled by jsx-control-statements/jsx-jcs-no-undef
+    no-use-before-define: [ 2, { functions: false } ]
+    no-var: 0
+    no-with: 2
+    radix: 2
+    space-infix-ops: [ 2, { int32Hint: false } ]
+    space-unary-ops: [ 2, { words: true, nonwords: false } ]
+    use-isnan: 2
+    wrap-iife: [ 2, "outside" ]
+
+    # 1 = warnings (fugly code)
+    array-bracket-spacing: [ 1, "always", { singleValue: false, objectsInArrays: false, arraysInArrays: false } ]
+    arrow-spacing: 1
+    comma-dangle: [ 1, "never" ]
+    comma-spacing: [ 1, { before: false, after: true } ]
+    func-call-spacing: [ 1, "never" ]
+    func-style: [ 1, "declaration", { allowArrowFunctions: true } ]
+    indent: [ 1, 4, { "SwitchCase": 0 } ]
+    jsx-quotes: [ 1, "prefer-single" ]
+    key-spacing: [ 1, { beforeColon: false, afterColon: true } ]
+    keyword-spacing: 1
+    linebreak-style: [ 1, "unix" ]
+    no-extra-parens: [ 1, "all", { ignoreJSX: "all" } ]
+    no-implicit-coercion: [ 1, { "boolean": false } ]
+    no-multi-spaces: 1
+    no-multiple-empty-lines: [ 1, { "max": 2, "maxEOF": 0 } ]
+    no-trailing-spaces: 1
+    no-unused-vars: [ 1, { argsIgnorePattern: "^_", varsIgnorePattern: "(^log$)|(^_.*)" } ]
+    no-useless-return: 1
+    object-curly-spacing: [ 1, "always" ]
+    prefer-const: 0
+    quotes: [ 1, "single", { avoidEscape: true, allowTemplateLiterals: true }]
+    require-await: 1
+    require-yield: 1
+    rest-spread-spacing: [ 1, "never" ]
+    semi: [ 1 , "always"]
+    space-before-blocks: 1
+    space-before-function-paren: [ 1, "always" ]
+    spaced-comment: [ 1 , "always", { exceptions: ["*"], block: { balanced: true } } ]
+    strict: 0
+    template-curly-spacing: [ 1, "always" ]
+    template-tag-spacing: [ 1, "never" ]

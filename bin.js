@@ -33,7 +33,7 @@ var argv = require('yargs')
         type: 'string'
     })
     .option('help', {
-        alias: ['h', '?'],
+        alias: [ 'h', '?' ]
     })
     .help()
     .argv;
@@ -65,13 +65,13 @@ function write (value) {
     }
 }
 
-var keyPath = argv._[0] && (
+var keyPath = argv._[0] &&
     argv._[0]
         .replace(/\[/g, delimiter)
         .replace(/\]/g, '')
         .replace(/^\./, '')
         .split(delimiter)
-);
+;
 
 if (!keyPath) {
     write(config);

@@ -15,7 +15,7 @@ function findClosestSync (cwd, fileName) {
     var configFile;
     var currentDir = path.resolve(cwd);
 
-    while (true) {
+    for (;;) {
         try {
             configFile = path.join(currentDir, fileName);
 
@@ -51,10 +51,10 @@ function parseFileSync (filePath) {
 
 function fileExistsSync (path) {
     try {
-        fs.statSync(path).isFile()
-        return true
+        fs.statSync(path).isFile();
+        return true;
     } catch (_) { /* ignore error */}
-    return false
+    return false;
 }
 
 /**
@@ -86,18 +86,18 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         path.join(osHomedir(), '/.config/', appName),
         path.join(osHomedir(), '/.config/', appName, '/config'),
         path.join('/etc/', appName + 'rc'),
-        path.join('/etc/', appName, '/config'),
+        path.join('/etc/', appName, '/config')
     ].filter(Boolean);
 
     var locationsFound = locations.reduce(function (found, nextLoc) {
         if (fileExistsSync(nextLoc))
-            found.push(nextLoc)
+            found.push(nextLoc);
         else if (fileExistsSync(nextLoc + '.yml'))
-            found.push(nextLoc + '.yml')
+            found.push(nextLoc + '.yml');
         else if (fileExistsSync(nextLoc + '.json'))
-            found.push(nextLoc + '.json')
+            found.push(nextLoc + '.json');
         else if (fileExistsSync(nextLoc + '.yaml'))
-            found.push(nextLoc + '.yaml')
+            found.push(nextLoc + '.yaml');
 
         return found;
     }, []);
@@ -108,10 +108,10 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
 
     var finalConfig = deepExtend(
         defaults,
-        (envKey
+        envKey
             ? deepExtend(merged.defaults || {}, merged[envKey] || {})
             : merged
-        ),
+        ,
         {
             appName: appName,
             configs: locationsFound
@@ -119,4 +119,4 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
     );
 
     return deepFreeze(finalConfig);
-}
+};
