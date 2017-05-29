@@ -32,7 +32,7 @@ function findFile (dirPath, filenames) {
         var ls = fs.readdirSync(dirPath);
         for (var i = 0, listLen = ls.length; i < listLen; i++) {
             for (var ii = 0, fileLen = filenames.length; ii < fileLen; ii++) {
-                if (ls[i] === filenames[ii]) return filenames[ii];
+                if (ls[i] === filenames[ii]) return path.join(dirPath, filenames[ii]);
             }
         }
     } catch (_) { /* ignore error */ }
@@ -94,7 +94,11 @@ function loadFile (filePath) {
  */
 function getDefaultLocations (appName) {
     return [
-        findClosestFile(process.cwd(), [ '.' + appName + 'rc', '.' + appName + 'rc.yml', '.' + appName + 'rc.json' ]),
+        findClosestFile(process.cwd(), [
+            '.' + appName + 'rc',
+            '.' + appName + 'rc.yml',
+            '.' + appName + 'rc.json'
+        ]),
         path.join(osHomedir(), '.' + appName + 'rc'),
         path.join(osHomedir(), appName, '/config'),
         path.join(osHomedir(), '.' + appName, '/config'),
@@ -148,7 +152,9 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         if (!nextLoc) return results; // findClosestFile() may return undefined
 
         // find existing files
-        var found = findFile(path.dirname(nextLoc), [ nextLoc, nextLoc + '.yml', nextLoc + '.json' ]);
+        var filePath = path.dirname(nextLoc);
+        var fileName = path.basename(nextLoc);
+        var found = findFile(filePath, [ fileName, fileName + '.yml', fileName + '.json' ]);
         if (found && results.indexOf(found) === -1) results.push(nextLoc);
 
         return results;
