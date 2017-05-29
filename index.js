@@ -10,6 +10,17 @@ var NODE_ENV = process.env.NODE_ENV;
 
 
 /**
+ * legacy isArray
+ * @arg { any }
+ * @returns { bool }
+ */
+
+var isArray = Array.isArray || function (arr) {
+    return Object.prototype.toString.call(arr) === '[object Array]';
+};
+
+
+/**
  * findFile
  * returns the first filename found in directory
  * @arg { string } dirPath
@@ -124,7 +135,7 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
     if (typeof _locations === 'string') {
         locations = _locations.split(';');
     }
-    else if (Array.isArray(_locations)) {
+    else if (isArray(_locations)) {
         locations = _locations;
     }
 
@@ -138,7 +149,7 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
 
         // find existing files
         var found = findFile(path.dirname(nextLoc), [ nextLoc, nextLoc + '.yml', nextLoc + '.json' ]);
-        if (found && !results.includes(found)) results.push(nextLoc);
+        if (found && results.indexOf(found) === -1) results.push(nextLoc);
 
         return results;
     }, []);
