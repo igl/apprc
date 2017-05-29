@@ -8,36 +8,60 @@ var deepExtend = require('deep-extend');
 var deepFreeze = require('deep-freeze');
 var NODE_ENV = process.env.NODE_ENV;
 
+
 /**
- * Utils
+ * findFile
+ * returns the first filename found in directory
+ * @arg { string } dirPath
+ * @arg { string[] } filenames
+ * @return { string? } filename
  */
-function findClosestSync (cwd, fileName) {
-    var configFile;
-    var currentDir = path.resolve(cwd);
-
-    for (;;) {
-        try {
-            configFile = path.join(currentDir, fileName);
-
-            if (fs.statSync(configFile).isFile()) {
-                break;
+function findFile (dirPath, filenames) {
+    try {
+        var ls = fs.readdirSync(dirPath);
+        for (var i = 0, listLen = ls.length; i < listLen; i++) {
+            for (var ii = 0, fileLen = filenames.length; ii < fileLen; ii++) {
+                if (ls[i] === filenames[ii]) return filenames[ii];
             }
-        } catch (_) {
-            configFile = undefined;
         }
-
-        configFile = undefined;
-        currentDir = path.resolve(currentDir, '..');
-
-        if (currentDir === '/') {
-            break;
-        }
-    }
-
-    return configFile;
+    } catch (_) { /* ignore error */ }
+    // return undefined;
 }
 
-function parseFileSync (filePath) {
+
+/**
+ * findClosestFile
+ * returns the first filename found in any parent directory until "/" (root)
+ * @arg { string } dirPath
+ * @arg { string[] } filenames
+ * @return { string? } filename
+ */
+function findClosestFile (dirPath, filenames) {
+    var found;
+    var currentDir = path.resolve(dirPath);
+
+    for (;;) {
+        found = findFile(currentDir, filenames);
+
+        if (found || currentDir === '/') {
+            break;
+        }
+
+        currentDir = path.resolve(currentDir, '..');
+    }
+
+    return found;
+}
+
+
+/**
+ * loadFile
+ * read and parses a yml files content (nice side effect: JSON is valid yaml syntax)
+ *
+ * @arg { string } filePath
+ * @return { Object } config file contents
+ */
+function loadFile (filePath) {
     try {
         var data = fs.readFileSync(filePath, 'utf8');
         return YML.safeLoad(data);
@@ -49,23 +73,41 @@ function parseFileSync (filePath) {
     }
 }
 
-function fileExistsSync (path) {
-    try {
-        fs.statSync(path).isFile();
-        return true;
-    } catch (_) { /* ignore error */}
-    return false;
-}
 
 /**
- * Main
+ * getDefaultLocations
+ * returns a list of lookup paths
+ *
+ * @arg { string } appName
+ * @return { string[] } lookup paths
+ */
+function getDefaultLocations (appName) {
+    return [
+        findClosestFile(process.cwd(), [ '.' + appName + 'rc', '.' + appName + 'rc.yml', '.' + appName + 'rc.json' ]),
+        path.join(osHomedir(), '.' + appName + 'rc'),
+        path.join(osHomedir(), appName, '/config'),
+        path.join(osHomedir(), '.' + appName, '/config'),
+        path.join(osHomedir(), '/.config/', appName),
+        path.join(osHomedir(), '/.config/', appName, '/config'),
+        path.join('/etc/', appName + 'rc'),
+        path.join('/etc/', appName, '/config')
+    ];
+}
+
+
+/**
+ * apprc
+ * @arg { Object? } defaults
+ * @arg { string? } envKey name of environment-variable switch
+ * @arg { string? } appName name of app
+ * @arg { string? | string[]? } locations overwrite lookup-paths
  */
 module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
-    var cwd = process.cwd();
-    var pkg = parseFileSync(findClosestSync(cwd, 'package.json'));
+    // parse arguments
+    var pkg = loadFile(findClosestFile(process.cwd(), ['package.json']));
 
     var defaults = _extraVars || {};
-    var envKey = _envKey ? _envKey : NODE_ENV || 'development';
+    var envKey = _envKey != null ? _envKey : NODE_ENV || 'development';
     var appName = _appName || pkg.name;
 
     if (!appName) {
@@ -76,36 +118,35 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         );
     }
 
-    var locations = _locations || [
-        findClosestSync(cwd, '.' + appName + 'rc'),
-        findClosestSync(cwd, '.' + appName + 'rc.yml'),
-        findClosestSync(cwd, '.' + appName + 'rc.json'),
-        path.join(osHomedir(), '.' + appName + 'rc'),
-        path.join(osHomedir(), appName, '/config'),
-        path.join(osHomedir(), '.' + appName, '/config'),
-        path.join(osHomedir(), '/.config/', appName),
-        path.join(osHomedir(), '/.config/', appName, '/config'),
-        path.join('/etc/', appName + 'rc'),
-        path.join('/etc/', appName, '/config')
-    ].filter(Boolean);
+    // list of all locations that may contain config files
+    var locations;
 
-    var locationsFound = locations.reduce(function (found, nextLoc) {
-        if (fileExistsSync(nextLoc))
-            found.push(nextLoc);
-        else if (fileExistsSync(nextLoc + '.yml'))
-            found.push(nextLoc + '.yml');
-        else if (fileExistsSync(nextLoc + '.json'))
-            found.push(nextLoc + '.json');
-        else if (fileExistsSync(nextLoc + '.yaml'))
-            found.push(nextLoc + '.yaml');
+    if (typeof _locations === 'string') {
+        locations = _locations.split(';');
+    }
+    else if (Array.isArray(_locations)) {
+        locations = _locations;
+    }
 
-        return found;
+    if (!locations) {
+        locations = getDefaultLocations(appName);
+    }
+
+    // validate and dedupe list
+    locations = locations.reduce(function (results, nextLoc) {
+        if (!nextLoc) return results; // findClosestFile() may return undefined
+
+        // find existing files
+        var found = findFile(path.dirname(nextLoc), [ nextLoc, nextLoc + '.yml', nextLoc + '.json' ]);
+        if (found && !results.includes(found)) results.push(nextLoc);
+
+        return results;
     }, []);
 
-    var allConfigs = locationsFound.map(parseFileSync);
+    // load all and deep-merge
+    var merged = deepExtend.apply(null, locations.map(loadFile));
 
-    var merged = deepExtend.apply(null, allConfigs);
-
+    // compose returned config
     var finalConfig = deepExtend(
         defaults,
         envKey
@@ -114,9 +155,10 @@ module.exports = function apprc (_extraVars, _envKey, _appName, _locations) {
         ,
         {
             appName: appName,
-            configs: locationsFound
+            configs: locations
         }
     );
 
+    // freeze it!
     return deepFreeze(finalConfig);
 };
