@@ -1,13 +1,20 @@
 ---
 root: true
 extends: "eslint:recommended"
-parserOptions:
-    ecmaVersion: 6
-    sourceType: module
-    ecmaFeatures:
-        jsx: true
+parser: "babel-eslint"
+plugins: [ "flowtype" ]
+
 env:
+    es6: true
     node: true
+    browser: true
+
+parserOptions:
+    sourceType: module
+
+globals:
+    __DEV__: true
+
 rules:
     # 2 = errors (bugs)
     default-case: 2
@@ -24,18 +31,19 @@ rules:
     no-throw-literal: 2
     no-undef: 0 # handled by jsx-control-statements/jsx-jcs-no-undef
     no-use-before-define: [ 2, { functions: false } ]
-    no-var: 0
+    no-var: 2
     no-with: 2
     radix: 2
     space-infix-ops: [ 2, { int32Hint: false } ]
     space-unary-ops: [ 2, { words: true, nonwords: false } ]
     use-isnan: 2
     wrap-iife: [ 2, "outside" ]
+    yoda: 2
 
     # 1 = warnings (fugly code)
-    array-bracket-spacing: [ 1, "always", { singleValue: false, objectsInArrays: false, arraysInArrays: false } ]
+    array-bracket-spacing: [ 1, "always", { singleValue: true, objectsInArrays: false, arraysInArrays: false } ]
     arrow-spacing: 1
-    comma-dangle: [ 1, "never" ]
+    comma-dangle: [ 1, "always-multiline" ]
     comma-spacing: [ 1, { before: false, after: true } ]
     func-call-spacing: [ 1, "never" ]
     func-style: [ 1, "declaration", { allowArrowFunctions: true } ]
@@ -52,15 +60,27 @@ rules:
     no-unused-vars: [ 1, { argsIgnorePattern: "^_", varsIgnorePattern: "(^log$)|(^_.*)" } ]
     no-useless-return: 1
     object-curly-spacing: [ 1, "always" ]
-    prefer-const: 0
+    prefer-const: 1
     quotes: [ 1, "single", { avoidEscape: true, allowTemplateLiterals: true }]
     require-await: 1
     require-yield: 1
     rest-spread-spacing: [ 1, "never" ]
-    semi: [ 1 , "always"]
+    semi: [ 1 , "never"]
     space-before-blocks: 1
     space-before-function-paren: [ 1, "always" ]
     spaced-comment: [ 1 , "always", { exceptions: ["*"], block: { balanced: true } } ]
     strict: 0
     template-curly-spacing: [ 1, "always" ]
     template-tag-spacing: [ 1, "never" ]
+
+    # plugin rules
+    flowtype/define-flow-type: 2
+    flowtype/use-flow-type: 2
+    flowtype/boolean-style: 1
+    flowtype/delimiter-dangle: [ 1, "always-multiline" ]
+    flowtype/generic-spacing: [ 1, "never" ]
+    flowtype/semi: [ 1, "never" ]
+    react/no-did-mount-set-state: 2
+    react/no-did-update-set-state: 2
+    react/no-direct-mutation-state: 2
+    react/no-is-mounted: 2
