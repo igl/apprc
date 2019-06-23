@@ -19,14 +19,13 @@
     "test": "eslint bin.js index.js && ava test.js"
   },
   "devDependencies": {
-    "ava": "0.16.0",
-    "eslint": "^3.19.0"
+    "ava": "2.1.0",
+    "eslint": "6.0.0"
   },
   "dependencies": {
-    "deep-extend": "^0.5.0",
+    "deep-extend": "0.6.0",
     "deep-freeze": "0.0.1",
-    "js-yaml": "^3.8.4",
-    "os-homedir": "1.0.2",
-    "yargs": "^8.0.1"
+    "js-yaml": "3.13.1",
+    "yargs": "13.2.4"
   }
 }

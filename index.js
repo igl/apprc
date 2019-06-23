@@ -1,9 +1,9 @@
 'use strict';
 
+var os = require('os');
 var fs = require('fs');
 var path = require('path');
 var YML = require('js-yaml');
-var osHomedir = require('os-homedir');
 var deepExtend = require('deep-extend');
 var deepFreeze = require('deep-freeze');
 var NODE_ENV = process.env.NODE_ENV;
@@ -93,17 +93,19 @@ function loadFile (filePath) {
  * @return { string[] } lookup paths
  */
 function getDefaultLocations (appName) {
+    var homedir = os.homedir()
+
     return [
         findClosestFile(process.cwd(), [
             '.' + appName + 'rc',
             '.' + appName + 'rc.yml',
             '.' + appName + 'rc.json'
         ]),
-        path.join(osHomedir(), '.' + appName + 'rc'),
-        path.join(osHomedir(), appName, '/config'),
-        path.join(osHomedir(), '.' + appName, '/config'),
-        path.join(osHomedir(), '/.config/', appName),
-        path.join(osHomedir(), '/.config/', appName, '/config'),
+        path.join(homedir, '.' + appName + 'rc'),
+        path.join(homedir, appName, '/config'),
+        path.join(homedir, '.' + appName, '/config'),
+        path.join(homedir, '/.config/', appName),
+        path.join(homedir, '/.config/', appName, '/config'),
         path.join('/etc/', appName + 'rc'),
         path.join('/etc/', appName, '/config')
     ];
